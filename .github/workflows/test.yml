@@ -29,6 +29,8 @@ jobs:
         run: |
           docker pull localstack/localstack-pro &
           pip install localstack terraform-local awscli-local[ver1]
+          # TODO: tmp fix until SQS protocol issue is resolved
+          pip install botocore==1.31.80
           localstack start -d
 
       - name: Run tests
@@ -37,3 +39,4 @@ jobs:
         run: |
           make deploy
           make invoke
+          awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/test | grep LocalStack
