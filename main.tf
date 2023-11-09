@@ -1,3 +1,4 @@
+
 variable "LUMIGO_TRACER_TOKEN" {
     type    = string
     default = "test"
@@ -72,14 +73,14 @@ resource "aws_iam_role_policy" "lambda-perms" {
           "dynamodb:Scan",
         ],
         "Effect": "Allow",
-        "Resource": "arn:aws:dynamodb:*:*:*",
+        "Resource": aws_dynamodb_table.test.arn,
       },
       {
         "Action": [
           "sqs:SendMessage",
         ],
         "Effect": "Allow",
-        "Resource": "arn:aws:sqs:*:*:*",
+        "Resource": aws_sqs_queue.test.arn,
       }
     ]
   })
