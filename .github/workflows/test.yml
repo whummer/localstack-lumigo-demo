@@ -1,0 +1,39 @@
+name: CI Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install and start LocalStack
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: |
+          docker pull localstack/localstack-pro &
+          pip install localstack terraform-local awscli-local[ver1]
+          localstack start -d
+
+      - name: Run tests
+        env:
+          LUMIGO_TRACER_TOKEN: ${{ secrets.LUMIGO_TRACER_TOKEN }}
+        run: |
+          make deploy
+          make invoke
